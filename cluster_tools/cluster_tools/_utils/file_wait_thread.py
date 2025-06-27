@@ -32,6 +32,7 @@ class FileWaitThread(threading.Thread):
         self.waiting: dict[str, str] = {}
         self.retryMap: dict[str, int] = {}
         self.lock = threading.Lock()
+        self.logger = logging.getLogger(__name__)
         self.shutdown = False
         self.executor = executor
 
@@ -85,11 +86,11 @@ class FileWaitThread(threading.Thread):
 
                                 if self.retryMap[filename] <= FileWaitThread.MAX_RETRY:
                                     # Retry by looping again
-                                    logging.warning(
+                                    self.logger.warning(
                                         f"Job state is completed, but {filename} couldn't be found. Retrying {self.retryMap[filename]}/{FileWaitThread.MAX_RETRY}"
                                     )
                                 else:
-                                    logging.error(
+                                    self.logger.error(
                                         f"Job state is completed, but {filename} couldn't be found."
                                     )
                                     handle_completed_job(job_id, filename, True)
