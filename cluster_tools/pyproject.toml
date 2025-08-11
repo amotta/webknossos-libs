@@ -4,8 +4,7 @@ version = "0.0.0"  # filled by dunamai
 description = "Utility library for easily distributing code execution on clusters"
 authors = [{name= "scalable minds", email="hello@scalableminds.com"}]
 readme = "README.md"
-license-files = ["LICENSE"]
-license = "MIT"
+license = { file = "LICENSE" }
 requires-python = ">=3.10"
 dependencies = [
     "typing-extensions ~=4.12.0",
