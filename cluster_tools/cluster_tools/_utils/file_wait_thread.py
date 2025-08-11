@@ -48,6 +48,16 @@ class FileWaitThread(threading.Thread):
             self.waiting[filename] = value
 
     def run(self) -> None:
+        def check_if_file_exists(filename: str) -> bool:
+            try:
+                with open(filename, 'rb'):
+                    return True
+            except FileNotFoundError:
+                return False
+            except OSError as ex:
+                logging.warning(f"Unexpected error while trying to open {filename}:\n{ex}")
+                return False
+
         def handle_completed_job(
             job_id: str, filename: str, failed_early: bool
         ) -> None:
@@ -69,14 +79,14 @@ class FileWaitThread(threading.Thread):
                         # can vastly slow down the polling.
                         continue
 
-                    if os.path.exists(filename):
+                    if check_if_file_exists(filename):
                         # Check for output file as a fast indicator for job completion
                         handle_completed_job(job_id, filename, False)
                     elif self.executor is not None:
                         status = self.executor.check_job_state(job_id)
 
                         # We have to re-check for the output file since this could be created in the mean time
-                        if os.path.exists(filename):
+                        if check_if_file_exists(filename):
                             handle_completed_job(job_id, filename, False)
                         else:
                             if status == "completed":
