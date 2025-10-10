@@ -95,7 +95,7 @@ class FileWaitThread(threading.Thread):
 
                                 if self.retryMap[filename] <= FileWaitThread.MAX_RETRY:
                                     # Retry by looping again
-                                    logging.warning(
+                                    logging.info(
                                         f"Job state is completed, but {filename} couldn't be found. Retrying {self.retryMap[filename]}/{FileWaitThread.MAX_RETRY}"
                                     )
                                 else:
