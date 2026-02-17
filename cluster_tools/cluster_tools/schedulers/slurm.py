@@ -569,10 +569,18 @@ class _JobSubmitThread(threading.Thread):
             if self._stop_event.is_set():
                 return
 
+            show_msg = True
             while (
-                SlurmExecutor.get_number_of_submitted_jobs() + job_size
+                (n_submitted_jobs := SlurmExecutor.get_number_of_submitted_jobs()) + job_size
                 > max_submit_jobs
             ):
+                if show_msg:
+                    logging.warning(
+                        f"Cannot submit {job_size} jobs because {n_submitted_jobs} of "
+                        f"{max_submit_jobs} queue slots are already in use. Waiting..."
+                    )
+                    show_msg = False
+
                 # _stop_event.wait will wait for SLURM_QUEUE_CHECK_INTERVAL unless the event is signaled
                 # in which case the thread was stopped
                 self._stop_event.wait(SLURM_QUEUE_CHECK_INTERVAL)
